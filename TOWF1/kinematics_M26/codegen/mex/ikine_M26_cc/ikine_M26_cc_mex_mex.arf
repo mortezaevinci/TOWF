@@ -1,0 +1,8 @@
+libemlrt.lib
+libut.lib
+libmwblascompat32.lib
+libmwmathutil.lib
+/export:mexFunction
+/export:ikine_M26_cc
+/export:ikine_M26_cc_initialize
+/export:ikine_M26_cc_terminate

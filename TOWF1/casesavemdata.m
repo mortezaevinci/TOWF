@@ -1,0 +1,1 @@
+armparamsarr{statecur{3}}.M2data{statecur{2}}=mbedparamsarr{statecur{3}}.M2data;

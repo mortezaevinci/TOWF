@@ -1,0 +1,109 @@
+<pre class="code">
+<span class="srcline"><span class="lineno"><a href="1,1">  1</a></span><span class="line"><span class="keyword">function</span> [<span class="var type0" id="S2T0U3">qout</span> <span class="var type0" id="S3T0U4">isconverged</span>] = <span class="message fatal" id="M3F1C">ikine_M26</span>(<span class="var type0" id="S4T0U7">TT</span>, <span class="var type0" id="S5T0U8">L</span>, <span class="var type0" id="S6T0U9">q0</span>) <span class="comment">%#codegen</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,2">  2</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,3">  3</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,4">  4</a></span><span class="line">    <span class="var type0" id="S7T0U12">method</span>=1; <span class="comment">%0 for ordinary jacobean, 1 for DLS</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,5">  5</a></span><span class="line">    </span></span>
+<span class="srcline"><span class="lineno"><a href="1,6">  6</a></span><span class="line">	<span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,7">  7</a></span><span class="line">	<span class="comment">%  solution control parameters</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,8">  8</a></span><span class="line">	<span class="comment">%</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,9">  9</a></span><span class="line">	<span class="var type0" id="S8T0U16">ilimit</span> = 250;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,10"> 10</a></span><span class="line">	<span class="var type0" id="S9T0U20">stol</span> = 1e-2;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,11"> 11</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,12"> 12</a></span><span class="line">	<span class="var type0" id="S3T0U24">isconverged</span>=1;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,13"> 13</a></span><span class="line"><span class="var type0" id="S10T0U28">dq</span>=zeros(6,1);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,14"> 14</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,15"> 15</a></span><span class="line">	<span class="keyword">if</span> nargin == 2,</span></span>
+<span class="srcline"><span class="lineno"><a href="1,16"> 16</a></span><span class="line">		<span class="var type0" id="S13T0U41">q</span> = zeros(6, 1);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,17"> 17</a></span><span class="line">	<span class="keyword">else</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,18"> 18</a></span><span class="line">		<span class="var type0" id="S13T0U49">q</span> = <span class="var type0" id="S6T0U51">q0</span>(:);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,19"> 19</a></span><span class="line">    <span class="keyword">end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,20"> 20</a></span><span class="line">    </span></span>
+<span class="srcline"><span class="lineno"><a href="1,21"> 21</a></span><span class="line">    <span class="var type0" id="S14T0U55">n</span> = numel(<span class="var type0" id="S13T0U58">q</span>);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,22"> 22</a></span><span class="line">   </span></span>
+<span class="srcline"><span class="lineno"><a href="1,23"> 23</a></span><span class="line">		<span class="keyword">if</span> <span class="var type0" id="S14T0U62">n</span> == 6</span></span>
+<span class="srcline"><span class="lineno"><a href="1,24"> 24</a></span><span class="line">		</span></span>
+<span class="srcline"><span class="lineno"><a href="1,25"> 25</a></span><span class="line">		</span></span>
+<span class="srcline"><span class="lineno"><a href="1,26"> 26</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,27"> 27</a></span><span class="line">	<span class="var type0" id="S16T0U66">tcount</span> = 0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,28"> 28</a></span><span class="line"><span class="comment">% 	if ishomog(tr),		% single xform case</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,29"> 29</a></span><span class="line">		<span class="var type0" id="S17T0U70">nm</span> = 5;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,30"> 30</a></span><span class="line">		<span class="var type0" id="S18T0U74">count</span> = 0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,31"> 31</a></span><span class="line">		<span class="keyword">while</span> <span class="var type0" id="S17T0U78">nm</span> &gt; <span class="var type0" id="S9T0U79">stol</span>,</span></span>
+<span class="srcline"><span class="lineno"><a href="1,32"> 32</a></span><span class="line">            </span></span>
+<span class="srcline"><span class="lineno"><a href="1,33"> 33</a></span><span class="line">			<span class="var type0" id="S19T0U82">dx</span> = -T2cartesian_real(fkine_M26(<span class="var type0" id="S5T0U89">L</span>, <span class="var type0" id="S13T0U91">q</span>'))+T2cartesian_real(<span class="var type0" id="S4T0U94">TT</span>);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,34"> 34</a></span><span class="line">            </span></span>
+<span class="srcline"><span class="lineno"><a href="1,35"> 35</a></span><span class="line">            <span class="keyword">switch</span> <span class="var type0" id="S7T0U96">method</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,36"> 36</a></span><span class="line">                <span class="keyword">case</span> 0</span></span>
+<span class="srcline"><span class="lineno"><a href="1,37"> 37</a></span><span class="line">            <span class="message error" id="M1F1C"><span class="keyword">try</span></span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,38"> 38</a></span><span class="line"><span class="message error" id="M1F1C">			<span class="var type0" id="S10T0U102">dq</span> = rem(pinv( jacob_M26(<span class="var type0" id="S5T0U110">L</span>, <span class="var type0" id="S13T0U111">q</span>) ) * <span class="var type0" id="S19T0U112">dx</span>,2*pi);</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,39"> 39</a></span><span class="line"><span class="message error" id="M1F1C">            <span class="keyword">end</span></span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,40"> 40</a></span><span class="line">            </span></span>
+<span class="srcline"><span class="lineno"><a href="1,41"> 41</a></span><span class="line">                <span class="keyword">case</span> 1</span></span>
+<span class="srcline"><span class="lineno"><a href="1,42"> 42</a></span><span class="line">                    <span class="message error" id="M2F1C"><span class="keyword">try</span></span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,43"> 43</a></span><span class="line"><span class="message error" id="M2F1C">                        <span class="var type0" id="S26T0U122">J</span>=jacob_M26(<span class="var type0" id="S5T0U125">L</span>, <span class="var type0" id="S13T0U126">q</span>);</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,44"> 44</a></span><span class="line"><span class="message error" id="M2F1C">                        <span class="var type0" id="S27T0U129">lambda</span>=.005;</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,45"> 45</a></span><span class="line"><span class="message error" id="M2F1C">                        <span class="var type0" id="S10T0U133">dq</span>=rem(<span class="var type0" id="S26T0U140">J</span>'*(<span class="var type0" id="S26T0U145">J</span>*<span class="var type0" id="S26T0U147">J</span>'+<span class="var type0" id="S27T0U149">lambda</span>*eye(6))^-1*<span class="var type0" id="S19T0U155">dx</span>,2*pi)/10;</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,46"> 46</a></span><span class="line"><span class="message error" id="M2F1C">                    <span class="keyword">catch</span> <span class="var type0" id="S29T0U162">err</span></span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,47"> 47</a></span><span class="line"><span class="message error" id="M2F1C">                        <span class="var type0" id="S29T0U165">err</span>.message</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,48"> 48</a></span><span class="line"><span class="message error" id="M2F1C">                        <span class="var type0" id="S29T0U170">err</span>.stack.line</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,49"> 49</a></span><span class="line"><span class="message error" id="M2F1C">                    <span class="keyword">end</span></span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,50"> 50</a></span><span class="line">                    </span></span>
+<span class="srcline"><span class="lineno"><a href="1,51"> 51</a></span><span class="line">                    </span></span>
+<span class="srcline"><span class="lineno"><a href="1,52"> 52</a></span><span class="line">                    </span></span>
+<span class="srcline"><span class="lineno"><a href="1,53"> 53</a></span><span class="line">            <span class="keyword">end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,54"> 54</a></span><span class="line">                </span></span>
+<span class="srcline"><span class="lineno"><a href="1,55"> 55</a></span><span class="line">               </span></span>
+<span class="srcline"><span class="lineno"><a href="1,56"> 56</a></span><span class="line">            </span></span>
+<span class="srcline"><span class="lineno"><a href="1,57"> 57</a></span><span class="line">			<span class="var type0" id="S13T0U175">q</span> = rem(<span class="var type0" id="S13T0U179">q</span> + <span class="var type0" id="S10T0U180">dq</span>,2*pi);<span class="comment">%+rand(6,1).*.0001;</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,58"> 58</a></span><span class="line">            <span class="keyword">for</span> <span class="var type0" id="S30T0U187">ii</span>=1:numel(<span class="var type0" id="S13T0U192">q</span>)</span></span>
+<span class="srcline"><span class="lineno"><a href="1,59"> 59</a></span><span class="line">               <span class="keyword">if</span> <span class="var type0" id="S13T0U197">q</span>(<span class="var type0" id="S30T0U198">ii</span>)&gt;pi</span></span>
+<span class="srcline"><span class="lineno"><a href="1,60"> 60</a></span><span class="line">                   <span class="var type0" id="S13T0U204">q</span>(<span class="var type0" id="S30T0U205">ii</span>)=<span class="var type0" id="S13T0U208">q</span>(<span class="var type0" id="S30T0U209">ii</span>)-2*pi;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,61"> 61</a></span><span class="line">               <span class="keyword">end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,62"> 62</a></span><span class="line">               <span class="keyword">if</span> <span class="var type0" id="S13T0U218">q</span>(<span class="var type0" id="S30T0U219">ii</span>)&lt;-pi</span></span>
+<span class="srcline"><span class="lineno"><a href="1,63"> 63</a></span><span class="line">                   <span class="var type0" id="S13T0U226">q</span>(<span class="var type0" id="S30T0U227">ii</span>)=<span class="var type0" id="S13T0U230">q</span>(<span class="var type0" id="S30T0U231">ii</span>)+2*pi;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,64"> 64</a></span><span class="line">               <span class="keyword">end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,65"> 65</a></span><span class="line">            <span class="keyword">end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,66"> 66</a></span><span class="line">            </span></span>
+<span class="srcline"><span class="lineno"><a href="1,67"> 67</a></span><span class="line">            <span class="comment">%a non-mathematical enforcement of solution constraints</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,68"> 68</a></span><span class="line">            <span class="keyword">if</span> <span class="var type0" id="S13T0U240">q</span>(4)&gt;0</span></span>
+<span class="srcline"><span class="lineno"><a href="1,69"> 69</a></span><span class="line"><span class="comment">%                 %possibility1</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,70"> 70</a></span><span class="line"><span class="comment">%                q(1)=-q(1);</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,71"> 71</a></span><span class="line"><span class="comment">%                q(3)=-q(3);</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,72"> 72</a></span><span class="line"><span class="comment">%                q(5)=-q(5);</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,73"> 73</a></span><span class="line"></span></span>
+<span class="srcline"><span class="lineno"><a href="1,74"> 74</a></span><span class="line"><span class="var type0" id="S13T0U245">q</span>=kine_sol2(<span class="var type0" id="S13T0U248">q</span>);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,75"> 75</a></span><span class="line">            <span class="keyword">end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,76"> 76</a></span><span class="line">            </span></span>
+<span class="srcline"><span class="lineno"><a href="1,77"> 77</a></span><span class="line">            <span class="var type0" id="S13T0U251">q</span>=myjointlimits(<span class="var type0" id="S13T0U254">q</span>);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,78"> 78</a></span><span class="line">            </span></span>
+<span class="srcline"><span class="lineno"><a href="1,79"> 79</a></span><span class="line"><span class="comment">%             %specific to M26</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,80"> 80</a></span><span class="line"><span class="comment">%             if q(3)&lt;0</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,81"> 81</a></span><span class="line"><span class="comment">%                q(3)=q(3)+pi;</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,82"> 82</a></span><span class="line"><span class="comment">%                q(4)=-q(4);</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,83"> 83</a></span><span class="line"><span class="comment">%                if q(5)&lt;0</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,84"> 84</a></span><span class="line"><span class="comment">%                q(5)=q(5)+pi;</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,85"> 85</a></span><span class="line"><span class="comment">%                else</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,86"> 86</a></span><span class="line"><span class="comment">%                    q(5)=q(5)-pi;</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,87"> 87</a></span><span class="line"><span class="comment">%                end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,88"> 88</a></span><span class="line"><span class="comment">%                 </span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,89"> 89</a></span><span class="line"><span class="comment">%             end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,90"> 90</a></span><span class="line">            </span></span>
+<span class="srcline"><span class="lineno"><a href="1,91"> 91</a></span><span class="line">            </span></span>
+<span class="srcline"><span class="lineno"><a href="1,92"> 92</a></span><span class="line">			<span class="var type0" id="S17T0U257">nm</span> = norm(<span class="var type0" id="S10T0U260">dq</span>);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,93"> 93</a></span><span class="line">            <span class="keyword">if</span> isnan(<span class="var type0" id="S17T0U265">nm</span>)</span></span>
+<span class="srcline"><span class="lineno"><a href="1,94"> 94</a></span><span class="line">                <span class="var type0" id="S17T0U268">nm</span>=5;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,95"> 95</a></span><span class="line">            <span class="keyword">end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,96"> 96</a></span><span class="line">			<span class="var type0" id="S18T0U272">count</span> = <span class="var type0" id="S18T0U274">count</span>+1;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,97"> 97</a></span><span class="line">			<span class="keyword">if</span> <span class="var type0" id="S18T0U279">count</span> &gt; <span class="var type0" id="S8T0U280">ilimit</span>,</span></span>
+<span class="srcline"><span class="lineno"><a href="1,98"> 98</a></span><span class="line">				<span class="string">'Solution wouldn''t converge'</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,99"> 99</a></span><span class="line">                <span class="var type0" id="S3T0U285">isconverged</span>=0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,100">100</a></span><span class="line">                <span class="keyword">break</span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,101">101</a></span><span class="line">			<span class="keyword">end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,102">102</a></span><span class="line">		<span class="keyword">end</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,103">103</a></span><span class="line">		<span class="var type0" id="S2T0U290">qout</span> = <span class="var type0" id="S13T0U291">q</span>;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,104">104</a></span><span class="line">        <span class="keyword">else</span></span></span>
+<span class="srcline"><span class="lineno"><a href="1,105">105</a></span><span class="line">            	disp(<span class="string">'this only works with 6DOF arm'</span>);</span></span>
+<span class="srcline"><span class="lineno"><a href="1,106">106</a></span><span class="line">                <span class="var type0" id="S3T0U299">isconverged</span>=0;</span></span>
+<span class="srcline"><span class="lineno"><a href="1,107">107</a></span><span class="line">        <span class="keyword"><span class="keyword">end</span></span></span></span>
+</pre>
